@@ -1,0 +1,7 @@
+/* Cache uniquement les fichiers publics de l'application. Aucun stock n'est envoyé sur le réseau. */
+const CACHE='stock-local-v2.0.0';
+const CORE=['./','./index.html','./styles.css','./app.js','./xlsx.js','./manifest.webmanifest','./icon.svg','./apple-touch-icon.png'];
+const SCAN='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+self.addEventListener('install',event=>{event.waitUntil((async()=>{let cache=await caches.open(CACHE);await cache.addAll(CORE);try{await cache.add(new Request(SCAN,{mode:'no-cors'}));}catch(e){}await self.skipWaiting();})());});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('stock-local-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();})());});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin===self.location.origin){event.respondWith((async()=>{const cache=await caches.open(CACHE);const saved=await cache.match(event.request);if(saved)return saved;return fetch(event.request);})());} else if(event.request.url===SCAN){event.respondWith((async()=>{const cache=await caches.open(CACHE);const saved=await cache.match(event.request);if(saved)return saved;const response=await fetch(event.request);if(response.ok||response.type==='opaque')cache.put(event.request,response.clone());return response;})());}});
