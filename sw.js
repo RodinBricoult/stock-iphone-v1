@@ -1,5 +1,5 @@
 /* Cache des fichiers publics. La synchronisation optionnelle est déclenchée par l'application. */
-const CACHE='stock-local-v3.0.0';
+const CACHE='stock-local-v4.0.0';
 const CORE=['./','./index.html','./styles.css','./app.js','./xlsx.js','./manifest.webmanifest','./icon.svg','./apple-touch-icon.png'];
 const SCAN='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
 self.addEventListener('install',event=>{event.waitUntil((async()=>{let cache=await caches.open(CACHE);await cache.addAll(CORE);try{await cache.add(new Request(SCAN,{mode:'no-cors'}));}catch(e){}await self.skipWaiting();})());});
